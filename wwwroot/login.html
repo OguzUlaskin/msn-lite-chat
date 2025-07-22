@@ -1,0 +1,45 @@
+﻿<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <title>Giriş Yap - MSN Lite</title>
+    <link rel="stylesheet" href="style.css">
+
+</head>
+<body>
+    <div class="login-container">
+        <form id="loginForm" enctype="multipart/form-data">
+            <input type="text" name="username" placeholder="Kullanıcı adınızı girin" required><br>
+            <input type="file" name="profileImage" accept="image/*"><br>
+            <button type="submit">Sohbete Gir</button>
+        </form>
+    </div>
+
+    <script>
+        document.getElementById("loginForm").addEventListener("submit", async function (e) {
+            e.preventDefault();
+
+            const formData = new FormData(this);
+            const username = formData.get("username");
+
+            const response = await fetch("/api/account/login", {
+                method: "POST",
+                body: formData
+            });
+
+            if (response.ok) {
+                localStorage.setItem("username", username);
+                window.location.href = "chat.html";
+            } else {
+                alert("Giriş yapılamadı.");
+            }
+        });
+    </script>
+
+</body>
+</html>
+
+
+
+
+

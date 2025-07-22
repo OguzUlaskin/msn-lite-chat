@@ -1,0 +1,160 @@
+﻿<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <title>MSN Lite Chat</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #dbeeff;
+            margin: 0;
+            padding: 0;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 30px auto;
+            background-color: white;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+
+        .message {
+            display: flex;
+            align-items: flex-end;
+            margin-bottom: 10px;
+        }
+
+            .message.left {
+                justify-content: flex-start;
+            }
+
+            .message.right {
+                justify-content: flex-end;
+            }
+
+        .bubble {
+            padding: 10px 15px;
+            border-radius: 15px;
+            max-width: 60%;
+        }
+
+            .bubble.left {
+                background-color: #f1f1f1;
+            }
+
+            .bubble.right {
+                background-color: #cce4ff;
+            }
+
+        .profile-img {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            margin: 0 10px;
+            object-fit: cover;
+        }
+
+        .input-area {
+            margin-top: 20px;
+            display: flex;
+        }
+
+            .input-area input {
+                flex: 1;
+                padding: 10px;
+                font-size: 16px;
+            }
+
+            .input-area button {
+                padding: 10px 15px;
+                background-color: #1976d2;
+                color: white;
+                border: none;
+                cursor: pointer;
+            }
+
+        .header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+            .header h2 {
+                margin: 0;
+            }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <div class="header">
+            <img id="profileImage" class="profile-img" src="" alt="Profil Fotoğrafı">
+            <h2>MSN Lite Messenger</h2>
+        </div>
+
+        <div id="chatBox">
+            <!-- Mesajlar buraya eklenecek -->
+        </div>
+
+        <div class="input-area">
+            <input type="text" id="messageInput" placeholder="Mesaj yaz...">
+            <button onclick="sendMessage()">Gönder</button>
+        </div>
+    </div>
+
+    <script>
+        // 1. Kullanıcı adını ve profil fotoğrafını al
+        const username = localStorage.getItem("username");
+        const profileImagePath = `/images/profiles/${username}.jpg`;
+        document.getElementById("profileImage").src = profileImagePath;
+
+        // 2. Sohbet örnek mesajları (demo)
+        const chatBox = document.getElementById("chatBox");
+
+        function addMessage(message, isMe) {
+            const msgDiv = document.createElement("div");
+            msgDiv.classList.add("message", isMe ? "right" : "left");
+
+            const img = document.createElement("img");
+            img.src = profileImagePath;
+            img.classList.add("profile-img");
+
+            const bubble = document.createElement("div");
+            bubble.classList.add("bubble", isMe ? "right" : "left");
+            bubble.innerText = message;
+
+            if (isMe) {
+                msgDiv.appendChild(bubble);
+                msgDiv.appendChild(img);
+            } else {
+                msgDiv.appendChild(img);
+                msgDiv.appendChild(bubble);
+            }
+
+            chatBox.appendChild(msgDiv);
+            chatBox.scrollTop = chatBox.scrollHeight;
+        }
+
+        function sendMessage() {
+            const input = document.getElementById("messageInput");
+            const message = input.value.trim();
+            if (message === "") return;
+            addMessage(message, true); // sağda göster
+            input.value = "";
+
+            // Simülasyon: 1sn sonra karşı taraf cevaplıyor
+            //setTimeout(() => {
+            //    addMessage("Kalbim deneme yanıtı 💬", false); // solda göster
+            //}, 1000);
+        }
+
+        // Varsayılan ilk mesaj
+        //addMessage("Selam bebeğim 💕", false);
+    </script>
+
+</body>
+</html>
+

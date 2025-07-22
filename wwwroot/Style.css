@@ -1,0 +1,63 @@
+﻿body {
+    margin: 0;
+    padding: 0;
+    font-family: Arial, sans-serif;
+    background-image: url('images/background.jpeg');
+    background-size: cover; /* ✔️ Ekranı tamamen kaplar */
+    background-position: center; /* Ortala */
+    background-repeat: no-repeat; /* Tek parça */
+    height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.container {
+    background-color: rgba(255, 255, 255, 0.9);
+    padding: 20px 25px;
+    border-radius: 10px;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+    width: 260px; /* 👈 daha küçük yapıldı */
+    text-align: center;
+}
+
+
+    .login-container input,
+    .login-container button {
+        margin: 10px 0;
+        padding: 10px;
+        width: 100%;
+        border: 1px solid #ccc;
+        border-radius: 8px;
+    }
+
+    .login-container button {
+        background-color: #0078d7;
+        color: white;
+        font-weight: bold;
+        border: none;
+        cursor: pointer;
+        transition: background 0.3s;
+    }
+
+        .login-container button:hover {
+            background-color: #005bb5;
+        }
+
+input[type="file"] {
+    background-color: #4e9af1; /* Uyumlu mavi tonu */
+    color: white;
+    border: none;
+    padding: 6px 12px;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+    input[type="file"]::file-selector-button {
+        background-color: #4e9af1;
+        color: white;
+        border: none;
+        padding: 6px 12px;
+        border-radius: 5px;
+        cursor: pointer;
+    }
