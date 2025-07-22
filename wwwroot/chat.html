@@ -105,55 +105,58 @@
         </div>
     </div>
 
-    <script>
-        // 1. Kullanıcı adını ve profil fotoğrafını al
-        const username = localStorage.getItem("username");
-        const profileImagePath = `/images/profiles/${username}.jpg`;
-        document.getElementById("profileImage").src = profileImagePath;
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/6.0.0/signalr.min.js"></script>
+<script>
+    const username = localStorage.getItem("username");
+    const profileImagePath = `/images/profiles/${username}.jpg`;
+    document.getElementById("profileImage").src = profileImagePath;
 
-        // 2. Sohbet örnek mesajları (demo)
-        const chatBox = document.getElementById("chatBox");
+    const chatBox = document.getElementById("chatBox");
 
-        function addMessage(message, isMe) {
-            const msgDiv = document.createElement("div");
-            msgDiv.classList.add("message", isMe ? "right" : "left");
+    const connection = new signalR.HubConnectionBuilder()
+        .withUrl("/chatHub") // SignalR bağlantı noktası
+        .build();
 
-            const img = document.createElement("img");
-            img.src = profileImagePath;
-            img.classList.add("profile-img");
+    connection.on("ReceiveMessage", (user, message) => {
+        const isMe = user === username;
+        addMessage(message, isMe);
+    });
 
-            const bubble = document.createElement("div");
-            bubble.classList.add("bubble", isMe ? "right" : "left");
-            bubble.innerText = message;
+    connection.start().catch(err => console.error(err.toString()));
 
-            if (isMe) {
-                msgDiv.appendChild(bubble);
-                msgDiv.appendChild(img);
-            } else {
-                msgDiv.appendChild(img);
-                msgDiv.appendChild(bubble);
-            }
+    function addMessage(message, isMe) {
+        const msgDiv = document.createElement("div");
+        msgDiv.classList.add("message", isMe ? "right" : "left");
 
-            chatBox.appendChild(msgDiv);
-            chatBox.scrollTop = chatBox.scrollHeight;
+        const img = document.createElement("img");
+        img.src = profileImagePath;
+        img.classList.add("profile-img");
+
+        const bubble = document.createElement("div");
+        bubble.classList.add("bubble", isMe ? "right" : "left");
+        bubble.innerText = message;
+
+        if (isMe) {
+            msgDiv.appendChild(bubble);
+            msgDiv.appendChild(img);
+        } else {
+            msgDiv.appendChild(img);
+            msgDiv.appendChild(bubble);
         }
 
-        function sendMessage() {
-            const input = document.getElementById("messageInput");
-            const message = input.value.trim();
-            if (message === "") return;
-            addMessage(message, true); // sağda göster
-            input.value = "";
+        chatBox.appendChild(msgDiv);
+        chatBox.scrollTop = chatBox.scrollHeight;
+    }
 
-            // Simülasyon: 1sn sonra karşı taraf cevaplıyor
-            //setTimeout(() => {
-            //    addMessage("Kalbim deneme yanıtı 💬", false); // solda göster
-            //}, 1000);
-        }
+    function sendMessage() {
+        const input = document.getElementById("messageInput");
+        const message = input.value.trim();
+        if (message === "") return;
 
-        // Varsayılan ilk mesaj
-        //addMessage("Selam bebeğim 💕", false);
-    </script>
+        connection.invoke("SendMessage", username, message).catch(err => console.error(err.toString()));
+        input.value = "";
+    }
+</script>
 
 </body>
 </html>
