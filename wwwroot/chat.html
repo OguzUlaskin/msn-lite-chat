@@ -114,7 +114,7 @@
     const chatBox = document.getElementById("chatBox");
 
     const connection = new signalR.HubConnectionBuilder()
-        .withUrl("/chatHub") // SignalR bağlantı noktası
+        .withUrl("/chathub") // SignalR bağlantı noktası
         .build();
 
     connection.on("ReceiveMessage", (user, message) => {
