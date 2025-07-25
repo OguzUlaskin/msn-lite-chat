@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="tr">
 <head>
     <meta charset="UTF-8">
@@ -26,13 +26,13 @@
             margin-bottom: 10px;
         }
 
-            .message.left {
-                justify-content: flex-start;
-            }
+        .message.left {
+            justify-content: flex-start;
+        }
 
-            .message.right {
-                justify-content: flex-end;
-            }
+        .message.right {
+            justify-content: flex-end;
+        }
 
         .bubble {
             padding: 10px 15px;
@@ -40,13 +40,13 @@
             max-width: 60%;
         }
 
-            .bubble.left {
-                background-color: #f1f1f1;
-            }
+        .bubble.left {
+            background-color: #f1f1f1;
+        }
 
-            .bubble.right {
-                background-color: #cce4ff;
-            }
+        .bubble.right {
+            background-color: #cce4ff;
+        }
 
         .profile-img {
             width: 36px;
@@ -61,19 +61,19 @@
             display: flex;
         }
 
-            .input-area input {
-                flex: 1;
-                padding: 10px;
-                font-size: 16px;
-            }
+        .input-area input {
+            flex: 1;
+            padding: 10px;
+            font-size: 16px;
+        }
 
-            .input-area button {
-                padding: 10px 15px;
-                background-color: #1976d2;
-                color: white;
-                border: none;
-                cursor: pointer;
-            }
+        .input-area button {
+            padding: 10px 15px;
+            background-color: #1976d2;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
 
         .header {
             display: flex;
@@ -82,9 +82,9 @@
             margin-bottom: 20px;
         }
 
-            .header h2 {
-                margin: 0;
-            }
+        .header h2 {
+            margin: 0;
+        }
     </style>
 </head>
 <body>
@@ -105,63 +105,68 @@
         </div>
     </div>
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/7.0.5/signalr.min.js"></script>
-<script>
-    const username = localStorage.getItem("username");
-    const profileImagePath = `/images/profiles/${username}.jpg`;
-    document.getElementById("profileImage").src = profileImagePath;
+    <!-- SignalR Kütüphanesi -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/7.0.5/signalr.min.js"></script>
+    <script>
+        const username = localStorage.getItem("username");
+        const profileImagePath = `/images/profiles/${username}.jpg`;
+        document.getElementById("profileImage").src = profileImagePath;
 
-    const chatBox = document.getElementById("chatBox");
+        const chatBox = document.getElementById("chatBox");
 
-    // SignalR bağlantısı oluştur
-    const connection = new signalR.HubConnectionBuilder()
-        .withUrl("/chathub")
-        .build();
+        function addMessage(message, isMe) {
+            const msgDiv = document.createElement("div");
+            msgDiv.classList.add("message", isMe ? "right" : "left");
 
-    connection.on("ReceiveMessage", (sender, receiver, message, time) => {
-        const isMe = sender === username;
-        addMessage(message, isMe, sender, time);
-    });
+            const img = document.createElement("img");
+            img.src = profileImagePath;
+            img.classList.add("profile-img");
 
-    connection.start().catch(err => console.error(err.toString()));
+            const bubble = document.createElement("div");
+            bubble.classList.add("bubble", isMe ? "right" : "left");
+            bubble.innerText = message;
 
-    function addMessage(message, isMe, sender, time) {
-        const msgDiv = document.createElement("div");
-        msgDiv.classList.add("message", isMe ? "right" : "left");
+            if (isMe) {
+                msgDiv.appendChild(bubble);
+                msgDiv.appendChild(img);
+            } else {
+                msgDiv.appendChild(img);
+                msgDiv.appendChild(bubble);
+            }
 
-        const img = document.createElement("img");
-        img.src = `/images/profiles/${sender}.jpg`;
-        img.classList.add("profile-img");
-
-        const bubble = document.createElement("div");
-        bubble.classList.add("bubble", isMe ? "right" : "left");
-        bubble.innerText = message + " (" + time + ")";
-
-        if (isMe) {
-            msgDiv.appendChild(bubble);
-            msgDiv.appendChild(img);
-        } else {
-            msgDiv.appendChild(img);
-            msgDiv.appendChild(bubble);
+            chatBox.appendChild(msgDiv);
+            chatBox.scrollTop = chatBox.scrollHeight;
         }
 
-        chatBox.appendChild(msgDiv);
-        chatBox.scrollTop = chatBox.scrollHeight;
-    }
+        // SignalR bağlantısı başlatılıyor
+        const connection = new signalR.HubConnectionBuilder()
+            .withUrl("/chathub")
+            .build();
 
-    function sendMessage() {
-        const input = document.getElementById("messageInput");
-        const message = input.value.trim();
-        if (message === "") return;
+        connection.start()
+            .then(() => console.log("SignalR bağlantısı kuruldu"))
+            .catch(err => console.error("SignalR bağlantı hatası:", err));
 
-        connection.invoke("SendMessage", username, "partner", message)
-            .catch(err => console.error(err.toString()));
+        // Mesaj alma fonksiyonu
+        connection.on("ReceiveMessage", function (sender, receiver, message, time) {
+            const isMe = sender === username;
+            addMessage(`${sender} [${time}]: ${message}`, isMe);
+        });
 
-        input.value = "";
-    }
-</script>
+        // Mesaj gönderme fonksiyonu
+        function sendMessage() {
+            const input = document.getElementById("messageInput");
+            const message = input.value.trim();
+            if (message === "") return;
 
+            connection.invoke("SendMessage", username, "karsi", message)
+                .catch(err => console.error("Mesaj gönderilemedi:", err));
+
+            input.value = "";
+        }
+    </script>
 
 </body>
 </html>
+
 
