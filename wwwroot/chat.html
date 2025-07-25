@@ -105,7 +105,7 @@
         </div>
     </div>
 
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/6.0.0/signalr.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/7.0.5/signalr.min.js"></script>
 <script>
     const username = localStorage.getItem("username");
     const profileImagePath = `/images/profiles/${username}.jpg`;
@@ -113,28 +113,29 @@
 
     const chatBox = document.getElementById("chatBox");
 
+    // SignalR bağlantısı oluştur
     const connection = new signalR.HubConnectionBuilder()
-        .withUrl("/chathub") // SignalR bağlantı noktası
+        .withUrl("/chathub")
         .build();
 
-    connection.on("ReceiveMessage", (user, message) => {
-        const isMe = user === username;
-        addMessage(message, isMe);
+    connection.on("ReceiveMessage", (sender, receiver, message, time) => {
+        const isMe = sender === username;
+        addMessage(message, isMe, sender, time);
     });
 
     connection.start().catch(err => console.error(err.toString()));
 
-    function addMessage(message, isMe) {
+    function addMessage(message, isMe, sender, time) {
         const msgDiv = document.createElement("div");
         msgDiv.classList.add("message", isMe ? "right" : "left");
 
         const img = document.createElement("img");
-        img.src = profileImagePath;
+        img.src = `/images/profiles/${sender}.jpg`;
         img.classList.add("profile-img");
 
         const bubble = document.createElement("div");
         bubble.classList.add("bubble", isMe ? "right" : "left");
-        bubble.innerText = message;
+        bubble.innerText = message + " (" + time + ")";
 
         if (isMe) {
             msgDiv.appendChild(bubble);
@@ -153,10 +154,13 @@
         const message = input.value.trim();
         if (message === "") return;
 
-        connection.invoke("SendMessage", username, message).catch(err => console.error(err.toString()));
+        connection.invoke("SendMessage", username, "partner", message)
+            .catch(err => console.error(err.toString()));
+
         input.value = "";
     }
 </script>
+
 
 </body>
 </html>
