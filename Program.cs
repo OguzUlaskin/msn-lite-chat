@@ -1,34 +1,32 @@
-using MsnLiteChatApp.Hubs;
-using MsnLiteChatApp.Data;
 using Microsoft.EntityFrameworkCore;
+using MsnLiteChatApp.Data;
+using MsnLiteChatApp.Hubs;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
+// Add services to the container
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
-builder.Services.AddSignalR(); // SignalR desteği
+builder.Services.AddSignalR();
+
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
 var app = builder.Build();
 
-// Geliştirme ortamı için Swagger
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
     app.UseSwaggerUI();
 }
 
-// Middleware sırası
 app.UseHttpsRedirection();
-app.UseStaticFiles();         // wwwroot klasörü erişimi için
-app.UseDefaultFiles();        // index.html, login.html gibi dosyaları otomatik gösterir
-app.UseRouting();             // ⬅ SignalR için routing burada olmalı
+app.UseStaticFiles();
+app.UseDefaultFiles();
+app.UseRouting();
 app.UseAuthorization();
 
-// Ana sayfayı login.html’e yönlendir
 app.MapGet("/", context =>
 {
     context.Response.Redirect("/login.html");
@@ -36,4 +34,9 @@ app.MapGet("/", context =>
 });
 
 app.MapControllers();
-app.MapHub<Chat
+
+// ✅ SignalR ChatHub endpoint
+app.MapHub<ChatHub>("/chathub");
+
+app.Run();
+
